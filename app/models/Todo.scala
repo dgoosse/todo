@@ -4,7 +4,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
-case class Todo(title: String, id: Option[String]=Some("0"), order: Option[Int]=Some(0), completed: Option[Boolean]=Some(false), url: Option[String]=Some("/"))
+case class Todo(title: String, id: Option[String]=Some(java.util.UUID.randomUUID.toString), order: Option[Int]=Some(0), completed: Option[Boolean]=Some(false), url: Option[String]=Some("/"))
 
 object Todo {
   implicit val format: OFormat[Todo] = Json.format[Todo]

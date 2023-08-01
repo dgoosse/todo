@@ -10,7 +10,7 @@ import javax.inject._
 @Singleton
 class TodoController @Inject()(cc: ControllerComponents, repository: SimpleRepository) extends AbstractController(cc) {
 
-  repository.add(Todo("first todo"))
+  //def uuid() = java.util.UUID.randomUUID.toString
 
   // GET /api/todos
   def get = Action {
@@ -18,10 +18,11 @@ class TodoController @Inject()(cc: ControllerComponents, repository: SimpleRepos
     Ok(Json.toJson(all))
   }
 
+  // POST /api/todos
   def post = Action.apply(parse.json[Todo]) { r =>
-    val newTodo = r.body.copy(url = Some("http://localhost:9000/api/todos/1"))
-    repository.add(newTodo)
-    Ok(Json.toJson(newTodo))
+    val uuid = java.util.UUID.randomUUID.toString
+    val newTodo = r.body.copy(id = Some(uuid), url = Some(s"http://localhost:9000/api/todos/$uuid"))
+    Ok(Json.toJson(repository.add(newTodo)))
   }
 
 }

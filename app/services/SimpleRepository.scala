@@ -15,14 +15,14 @@ class SimpleRepository extends Repository[Todo] {
 
   var db = collection.mutable.Map[String, Todo]()
 
-  def uuid = java.util.UUID.randomUUID.toString
-
   def add(id: String, toDo: Todo): Option[Todo] = {
-    db.put(id, toDo.copy(id=Some(id)))
+    val copyTodo = toDo
+    db.put(id, copyTodo)
+    Some(copyTodo)
   }
 
-  def add(value: Todo): Option[Todo] = {
-    add(uuid, value)
+  def add(toDo: Todo): Option[Todo] = {
+    add(toDo.id.getOrElse("0"), toDo)
   }
 
   def get(key: String): Option[Todo] = {
