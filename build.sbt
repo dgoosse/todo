@@ -1,7 +1,7 @@
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(
-    name := """play-scala-starter-example""",
+    name := """todosmongo""",
     version := "1.0-SNAPSHOT",
     scalaVersion := "2.13.10",
     libraryDependencies ++= Seq(
