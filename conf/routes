@@ -10,9 +10,10 @@ GET     /count                      controllers.CountController.count
 GET     /message                    controllers.AsyncController.message
 
 GET     /api/todos                  controllers.TodoController.get
-
-+nocsrf
+GET     /api/todos/:id              controllers.TodoController.getById(id: String)
 POST    /api/todos                  controllers.TodoController.post
+DELETE  /api/todos                  controllers.TodoController.delete
+DELETE  /api/todos/:id              controllers.TodoController.deleteById(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(file)
