@@ -7,7 +7,7 @@ case class Todo(_id: Option[String]=None, title: Option[String], order: Option[I
 object Todo {
   implicit val format: OFormat[Todo] = Json.format[Todo]
 
-  def mergeWith(toDo: Todo, inTodo: Todo):Todo ={
+  def merge(toDo: Todo, inTodo: Todo):Todo ={
     toDo.copy(
       title = inTodo.title.orElse(toDo.title),
       order = inTodo.order.orElse(toDo.order),

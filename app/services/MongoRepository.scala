@@ -1,12 +1,10 @@
 package services
 
 import models.Todo
-import org.mongodb.scala.bson.codecs.Macros._
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.MongoClient.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala._
-import org.mongodb.scala.bson.ObjectId
-import org.mongodb.scala.ObservableImplicits
+import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.model.Filters._
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -28,7 +28,7 @@ class TodoController @Inject()(cc: ControllerComponents, repository: MongoReposi
   def post = Action.apply(parse.json[Todo]).async { r =>
     val inTodo = r.body
     val id: ObjectId = new ObjectId()
-    val newTodo = r.body.copy(_id = Some(id.toString), order = inTodo.order.orElse(Some(0)), completed = inTodo.completed.orElse(Some(false)), url = Some(s"http://localhost:9000/api/todos/$id"))
+    val newTodo = inTodo.copy(_id = Some(id.toString), order = inTodo.order.orElse(Some(0)), completed = inTodo.completed.orElse(Some(false)), url = Some(s"http://localhost:9000/api/todos/$id"))
     repository.create(id.toString, newTodo).map(toDo => if (toDo.isDefined) Ok(Json.toJson(toDo)) else NotFound)
   }
 
@@ -47,7 +47,7 @@ class TodoController @Inject()(cc: ControllerComponents, repository: MongoReposi
     val inTodo = r.body
     repository
       .read(id)
-      .flatMap(toDo => repository.update(id, Todo.mergeWith(toDo.get, inTodo)))
+      .flatMap(toDo => repository.update(id, Todo.merge(toDo.head, inTodo)))
       .map(toDo => if (toDo.isDefined) Ok(Json.toJson(toDo)) else NotFound)
   }
 
