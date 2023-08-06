@@ -11,13 +11,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MongoRepository extends AsyncRepository[Todo] {
 
-  val codecRegistry = fromRegistries(fromProviders(classOf[Todo]), DEFAULT_CODEC_REGISTRY )
+  private val codecRegistry = fromRegistries(fromProviders(classOf[Todo]), DEFAULT_CODEC_REGISTRY)
 
-  val mongoClient: MongoClient = MongoClient()
+  private val mongoClient: MongoClient = MongoClient()
 
-  val database: MongoDatabase = mongoClient.getDatabase("goo").withCodecRegistry(codecRegistry)
+  private val database: MongoDatabase = mongoClient.getDatabase("goo").withCodecRegistry(codecRegistry)
 
-  val collection: MongoCollection[Todo] = database.getCollection("todos")
+  private val collection: MongoCollection[Todo] = database.getCollection("todos")
 
   def create(id: String, value: Todo)(implicit ec: ExecutionContext): Future[Option[Todo]] = {
     collection
@@ -33,6 +33,20 @@ class MongoRepository extends AsyncRepository[Todo] {
       .map(_.headOption)
   }
 
+  def update(id: String, value: Todo)(implicit ec: ExecutionContext): Future[Option[Todo]] = {
+    collection
+      .replaceOne(equal("_id", id), value)
+      .toFuture()
+      .map(status => if (status.wasAcknowledged()) Some(value) else None)
+  }
+
+  def delete(id: String)(implicit ec: ExecutionContext): Future[Boolean] = {
+    collection
+      .deleteOne(equal("_id", id))
+      .toFuture()
+      .map(_.wasAcknowledged())
+  }
+
   def readAll()(implicit ec: ExecutionContext): Future[Seq[Todo]] = {
     collection
       .find()
@@ -46,19 +60,6 @@ class MongoRepository extends AsyncRepository[Todo] {
       .map(_.wasAcknowledged())
   }
 
-  def delete(id: String)(implicit ec: ExecutionContext): Future[Boolean] = {
-    collection
-      .deleteOne(equal("_id", id))
-      .toFuture()
-      .map(_.wasAcknowledged())
-  }
-
-  def update(id: String, value: Todo)(implicit ec: ExecutionContext): Future[Option[Todo]] = {
-    collection
-      .replaceOne(equal("_id", id), value)
-      .toFuture()
-      .map(status => if (status.wasAcknowledged()) Some(value) else None)
-  }
 }
 
 object MongoRepository {
