@@ -25,7 +25,7 @@ class MongoRepository extends AsyncRepository[Todo] {
     collection
       .insertOne(value)
       .toFuture()
-      .map(i => if (i.wasAcknowledged()) Option(value) else None)
+      .map(status => if (status.wasAcknowledged()) Some(value) else None)
   }
 
   def read(id: String)(implicit ec: ExecutionContext): Future[Option[Todo]] = {
@@ -59,7 +59,7 @@ class MongoRepository extends AsyncRepository[Todo] {
     collection
       .replaceOne(equal("_id", id), value)
       .toFuture()
-      .map(i => if (i.wasAcknowledged()) Option(value) else None)
+      .map(status => if (status.wasAcknowledged()) Some(value) else None)
   }
 }
 

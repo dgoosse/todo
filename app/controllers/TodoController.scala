@@ -26,9 +26,10 @@ class TodoController @Inject()(cc: ControllerComponents, repository: MongoReposi
 
   // POST /api/todos
   def post = Action.apply(parse.json[Todo]).async { r =>
+    val inTodo = r.body
     val id: ObjectId = new ObjectId()
-    val newTodo = r.body.copy(_id = Some(id.toString), order = Some(0), completed = Some(false), url = Some(s"http://localhost:9000/api/todos/$id"))
-    repository.create(id.toString, newTodo).map(o => if (o.isDefined) Ok(Json.toJson(o)) else NotFound)
+    val newTodo = r.body.copy(_id = Some(id.toString), order = inTodo.order.orElse(Some(0)), completed = inTodo.completed.orElse(Some(false)), url = Some(s"http://localhost:9000/api/todos/$id"))
+    repository.create(id.toString, newTodo).map(toDo => if (toDo.isDefined) Ok(Json.toJson(toDo)) else NotFound)
   }
 
   // DELETE /api/todos
@@ -39,6 +40,15 @@ class TodoController @Inject()(cc: ControllerComponents, repository: MongoReposi
   // DELETE /api/todos/:id
   def deleteById(id: String) = Action.async {
     repository.delete(id).map(done => if (done) Ok(Json.toJson(done)) else NotFound)
+  }
+
+  // PATCH /api/todos/:id
+  def patchById(id: String) = Action.apply(parse.json[Todo]).async { r =>
+    val inTodo = r.body
+    repository
+      .read(id)
+      .flatMap(toDo => repository.update(id, Todo.mergeWith(toDo.get, inTodo)))
+      .map(toDo => if (toDo.isDefined) Ok(Json.toJson(toDo)) else NotFound)
   }
 
 }
